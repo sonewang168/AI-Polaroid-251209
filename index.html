@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AI 拍立得">
+    <title>AI 拍立得 v3</title>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ios-blue: #007AFF; --ios-green: #34C759; --ios-red: #FF3B30; --ios-orange: #FF9500;
+            --ios-yellow: #FFCC00; --ios-pink: #FF2D55; --ios-purple: #AF52DE; --ios-teal: #5AC8FA;
+            --theme-primary: #1D1D1F; --theme-secondary: #2D2D2F; --theme-accent: #86868B;
+            --theme-highlight: #0A84FF; --theme-glass: rgba(29, 29, 31, 0.85);
+            --theme-glass-light: rgba(255, 255, 255, 0.1); --theme-border: rgba(255, 255, 255, 0.15);
+            --theme-text: #FFFFFF; --theme-text-secondary: rgba(255, 255, 255, 0.6);
+            --safe-top: env(safe-area-inset-top, 20px); --safe-bottom: env(safe-area-inset-bottom, 20px);
+            --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275); --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --cam-body: #a8d8ea; --cam-body-dark: #8ec5d6;
+        }
+        .theme-black-titanium { --theme-primary: #1D1D1F; --theme-secondary: #2D2D2F; --theme-accent: #86868B; --theme-highlight: #0A84FF; --theme-glass: rgba(29, 29, 31, 0.9); --theme-border: rgba(255, 255, 255, 0.12); --theme-text: #FFFFFF; --theme-text-secondary: rgba(255, 255, 255, 0.6); --cam-body: #3A3A3C; --cam-body-dark: #2D2D2F; }
+        .theme-white-titanium { --theme-primary: #F5F5F7; --theme-secondary: #E8E8ED; --theme-accent: #86868B; --theme-highlight: #0A84FF; --theme-glass: rgba(245, 245, 247, 0.9); --theme-border: rgba(0, 0, 0, 0.1); --theme-text: #1D1D1F; --theme-text-secondary: rgba(0, 0, 0, 0.5); --cam-body: #f5f5f5; --cam-body-dark: #e8e8e8; }
+        .theme-natural-titanium { --theme-primary: #ADA99F; --theme-secondary: #C4C0B6; --theme-accent: #8E8B82; --theme-highlight: #0A84FF; --theme-glass: rgba(173, 169, 159, 0.9); --theme-border: rgba(0, 0, 0, 0.1); --theme-text: #1D1D1F; --theme-text-secondary: rgba(0, 0, 0, 0.5); --cam-body: #C4C0B6; --cam-body-dark: #ADA99F; }
+        .theme-desert-titanium { --theme-primary: #BFB5A0; --theme-secondary: #D4C9B5; --theme-accent: #A39A87; --theme-highlight: #FF9500; --theme-glass: rgba(191, 181, 160, 0.9); --theme-border: rgba(0, 0, 0, 0.1); --theme-text: #1D1D1F; --theme-text-secondary: rgba(0, 0, 0, 0.5); --cam-body: #D4C9B5; --cam-body-dark: #BFB5A0; }
+        .theme-blue-titanium { --theme-primary: #394867; --theme-secondary: #4A5568; --theme-accent: #6B7C93; --theme-highlight: #5AC8FA; --theme-glass: rgba(57, 72, 103, 0.9); --theme-border: rgba(255, 255, 255, 0.15); --theme-text: #FFFFFF; --theme-text-secondary: rgba(255, 255, 255, 0.6); --cam-body: #4A5568; --cam-body-dark: #394867; }
+        .theme-pink { --theme-primary: #F9D5E5; --theme-secondary: #FCEAF0; --theme-accent: #E8A4C4; --theme-highlight: #FF2D55; --theme-glass: rgba(249, 213, 229, 0.9); --theme-border: rgba(0, 0, 0, 0.08); --theme-text: #1D1D1F; --theme-text-secondary: rgba(0, 0, 0, 0.5); --cam-body: #ffb6c1; --cam-body-dark: #ff9aa8; }
+        .theme-mint { --theme-primary: #C8E6D5; --theme-secondary: #DFF0E8; --theme-accent: #7DC4A5; --theme-highlight: #34C759; --theme-glass: rgba(200, 230, 213, 0.9); --theme-border: rgba(0, 0, 0, 0.08); --theme-text: #1D1D1F; --theme-text-secondary: rgba(0, 0, 0, 0.5); --cam-body: #a8e6cf; --cam-body-dark: #8cd9b8; }
+        .theme-sky { --theme-primary: #B8D4E8; --theme-secondary: #D0E4F0; --theme-accent: #6BAFCF; --theme-highlight: #5AC8FA; --theme-glass: rgba(184, 212, 232, 0.9); --theme-border: rgba(0, 0, 0, 0.08); --theme-text: #1D1D1F; --theme-text-secondary: rgba(0, 0, 0, 0.5); --cam-body: #a8d8ea; --cam-body-dark: #8ec5d6; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; }
+        html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Noto Sans TC', -apple-system, sans-serif; background: var(--theme-primary); color: var(--theme-text); touch-action: manipulation; transition: background 0.5s, color 0.5s; }
+        .app-container { width: 100%; height: 100%; display: flex; flex-direction: column; position: relative; overflow: hidden; opacity: 0; transition: opacity 0.8s; }
+        .app-container.loaded { opacity: 1; }
+
+        /* 開機動畫 */
+        .boot-screen { position: fixed; inset: 0; z-index: 99999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s, visibility 0.8s; }
+        .boot-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .boot-logo { position: relative; width: 150px; height: 150px; margin-bottom: 35px; }
+        .boot-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent; }
+        .boot-ring-1 { border-top-color: #0A84FF; border-right-color: #0A84FF; animation: spin 2s linear infinite; }
+        .boot-ring-2 { inset: 10px; border-bottom-color: #5E5CE6; border-left-color: #5E5CE6; animation: spin 2.5s linear infinite reverse; }
+        .boot-ring-3 { inset: 20px; border-top-color: #FF9500; animation: spin 3s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .boot-camera { position: absolute; inset: 28px; display: flex; align-items: center; justify-content: center; }
+        .boot-camera-body { width: 85px; height: 65px; background: linear-gradient(180deg, #a8d8ea 0%, #8ec5d6 100%); border-radius: 12px; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(0,0,0,0.4); animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .boot-lens { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(145deg, #1A1A1C, #0D0D0F); box-shadow: 0 3px 12px rgba(0,0,0,0.4); position: relative; }
+        .boot-lens::before { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: conic-gradient(from 0deg, #0A84FF, #5E5CE6, #AF52DE, #FF2D55, #FF9500, #34C759, #0A84FF); animation: spin 4s linear infinite; }
+        .boot-lens::after { content: ''; position: absolute; inset: 10px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #2D2D2F, #0D0D0F); }
+        .boot-flash { position: absolute; top: 5px; right: 7px; width: 12px; height: 8px; background: linear-gradient(145deg, #FFD60A, #FF9500); border-radius: 2px; }
+        .boot-shutter { position: absolute; top: -7px; left: 10px; width: 13px; height: 13px; background: linear-gradient(145deg, #ff6b6b, #ee5a5a); border-radius: 50%; border: 2px solid #fff; }
+        .boot-title { font-size: 26px; font-weight: 700; color: #fff; margin-bottom: 6px; opacity: 0; animation: fadeIn 1s 0.5s forwards; }
+        .boot-subtitle { font-size: 12px; color: rgba(255,255,255,0.6); margin-bottom: 45px; opacity: 0; animation: fadeIn 1s 0.8s forwards; letter-spacing: 2px; }
+        @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(10px); } }
+        .boot-progress { width: 170px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; opacity: 0; animation: fadeIn 1s 1s forwards; }
+        .boot-progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #0A84FF, #5E5CE6, #AF52DE); transition: width 0.3s; }
+        .boot-status { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 14px; opacity: 0; animation: fadeIn 1s 1.2s forwards; }
+        .boot-version { position: absolute; bottom: 35px; font-size: 10px; color: rgba(255,255,255,0.3); }
+
+        /* 主介面 */
+        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: calc(var(--safe-top) + 44px); padding-top: var(--safe-top); display: flex; align-items: center; justify-content: center; z-index: 100; pointer-events: none; }
+        .dynamic-island { background: var(--theme-glass); backdrop-filter: blur(30px); padding: 8px 16px; border-radius: 22px; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; box-shadow: 0 4px 20px rgba(0,0,0,0.25); pointer-events: auto; border: 1px solid var(--theme-border); }
+        .island-icon { font-size: 15px; }
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+
+        /* 相機頁面 */
+        .camera-page { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; padding-top: calc(var(--safe-top) + 50px); padding-bottom: calc(135px + var(--safe-bottom)); background: linear-gradient(180deg, var(--theme-primary) 0%, var(--theme-secondary) 100%); position: relative; overflow: hidden; }
+
+        /* instax 相機 */
+        .camera-body { width: 250px; height: 325px; background: linear-gradient(180deg, var(--cam-body) 0%, var(--cam-body-dark) 100%); border-radius: 26px 26px 34px 34px; position: relative; box-shadow: 0 14px 45px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.4), inset 0 -4px 12px rgba(0,0,0,0.1); }
+        .cam-flash { position: absolute; top: 16px; right: 25px; width: 40px; height: 26px; background: linear-gradient(180deg, #f8f9fa 0%, #e0e0e0 100%); border-radius: 5px; box-shadow: inset 0 2px 3px rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.2); transition: box-shadow 0.15s; }
+        .cam-viewfinder { position: absolute; top: 24px; left: 50%; transform: translateX(-50%); width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #555, #222); box-shadow: inset 0 1px 2px rgba(255,255,255,0.3); }
+        .shutter-socket { position: absolute; top: 12px; left: 20px; width: 50px; height: 50px; background: linear-gradient(180deg, #e0e0e0 0%, #c0c0c0 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.2); }
+        .shutter-btn { width: 38px; height: 38px; border-radius: 50%; border: none; background: radial-gradient(circle at 30% 30%, #ff6b6b, #ee5a5a); cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3); transition: transform 0.08s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .shutter-btn:active { transform: scale(0.85) translateY(2px); }
+        .lens-mount { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 155px; height: 155px; background: linear-gradient(180deg, #2d3436 0%, #1a1a1a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 4px 10px rgba(255,255,255,0.1), 0 8px 22px rgba(0,0,0,0.3); }
+        .lens-ring-outer { width: 130px; height: 130px; background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 50%, #1a1a1a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .lens-text { position: absolute; width: 100%; height: 100%; }
+        .lens-text svg { width: 100%; height: 100%; }
+        .lens-text text { font-size: 6px; fill: rgba(255,255,255,0.35); letter-spacing: 0.8px; }
+        .lens-glass { width: 78px; height: 78px; border-radius: 50%; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%); overflow: hidden; position: relative; box-shadow: inset 0 0 16px rgba(0,0,0,0.5); }
+        .lens-glass video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .lens-glass-shine { position: absolute; top: 8px; left: 8px; width: 16px; height: 16px; background: radial-gradient(circle, rgba(255,255,255,0.35), transparent); border-radius: 50%; pointer-events: none; }
+        .lens-tap-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); color: #fff; font-size: 10px; opacity: 0; transition: opacity 0.3s; pointer-events: none; border-radius: 50%; }
+        .lens-glass:not(:has(video[srcObject])) .lens-tap-hint,
+        .lens-glass video:not([srcObject]) ~ .lens-tap-hint { opacity: 1; }
+        .cam-brand { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); text-align: center; }
+        .cam-brand-name { font-family: 'Pacifico', cursive; font-size: 1.15em; color: #555; text-shadow: 0 1px 0 rgba(255,255,255,0.5); }
+        .cam-brand-model { font-size: 0.5em; color: #777; letter-spacing: 2px; margin-top: 2px; }
+        .film-counter { position: absolute; bottom: 20px; right: 20px; background: #333; color: #FFD60A; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; font-family: 'Courier New', monospace; }
+        .cam-controls { position: absolute; bottom: -52px; left: 0; right: 0; display: flex; justify-content: center; gap: 16px; }
+        .cam-ctrl-btn { width: 44px; height: 44px; background: var(--theme-glass); backdrop-filter: blur(20px); border: 1px solid var(--theme-border); border-radius: 50%; color: var(--theme-text); font-size: 17px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.1s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .cam-ctrl-btn:active { transform: scale(0.88); background: var(--theme-highlight); }
+        .cam-ctrl-btn.active { background: var(--theme-highlight); color: #fff; border-color: transparent; }
+
+        /* 花邊選擇器 */
+        .frame-selector { position: absolute; bottom: calc(85px + var(--safe-bottom)); left: 0; right: 0; padding: 10px 0; }
+        .frame-selector-label { display: block; text-align: center; font-size: 11px; color: var(--theme-text-secondary); margin-bottom: 8px; }
+        .frame-options { display: flex; justify-content: center; gap: 9px; flex-wrap: wrap; padding: 0 12px; }
+        .frame-option { width: 38px; height: 38px; border-radius: 9px; cursor: pointer; border: 3px solid transparent; transition: all 0.1s; box-shadow: 0 2px 6px rgba(0,0,0,0.2); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .frame-option:active { transform: scale(0.9); }
+        .frame-option.selected { border-color: var(--theme-highlight); transform: scale(1.12); }
+        .frame-option.frame-white { background: #fff; }
+        .frame-option.frame-black { background: #1a1a1a; }
+        .frame-option.frame-mint { background: #a8e6cf; }
+        .frame-option.frame-pink { background: #ffb6c1; }
+        .frame-option.frame-floral { background: linear-gradient(135deg, #ffefd5 25%, #ffe4e1 75%); }
+        .frame-option.frame-plaid { background: repeating-linear-gradient(0deg, #b0c4de, #b0c4de 3px, #87ceeb 3px, #87ceeb 6px); }
+        .frame-option.frame-gradient { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a18cd1 100%); }
+
+        /* 底片退出動畫 */
+        .polaroid-film { position: fixed; bottom: calc(165px + var(--safe-bottom)); left: 50%; transform: translateX(-50%) translateY(150%); width: 190px; background: white; border-radius: 3px; box-shadow: 0 8px 30px rgba(0,0,0,0.4); z-index: 500; opacity: 0; transition: all 0.8s var(--spring); padding: 8px; }
+        .polaroid-film.ejecting { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .polaroid-film.frame-black { background: #1a1a1a; }
+        .polaroid-film.frame-mint { background: #a8e6cf; }
+        .polaroid-film.frame-pink { background: #ffb6c1; }
+        .polaroid-film.frame-floral { background: linear-gradient(135deg, #ffefd5 25%, #ffe4e1 75%); }
+        .polaroid-film.frame-plaid { background: repeating-linear-gradient(0deg, #b0c4de, #b0c4de 4px, #87ceeb 4px, #87ceeb 8px); }
+        .polaroid-film.frame-gradient { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #a18cd1 100%); }
+        .polaroid-image-area { width: 100%; aspect-ratio: 1; background: #f5f5f5; overflow: hidden; position: relative; border-radius: 2px; }
+        .polaroid-image-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 2s; }
+        .polaroid-image-area img.developed { opacity: 1; }
+        .polaroid-developing { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(220,220,200,0.9) 100%); display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px; transition: opacity 2s; }
+        .polaroid-developing.hidden { opacity: 0; pointer-events: none; }
+        .polaroid-photo-text { padding: 5px 4px 9px; text-align: center; font-size: 10px; color: #666; font-style: italic; }
+        .polaroid-film.frame-black .polaroid-photo-text { color: #aaa; }
+
+        /* 散落照片（可拖曳）*/
+        .scattered-photos { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 50; }
+        .scattered-photo { position: absolute; width: 85px; background: white; border-radius: 3px; box-shadow: 0 4px 14px rgba(0,0,0,0.3); cursor: grab; pointer-events: auto; transition: box-shadow 0.2s; padding: 5px; touch-action: none; }
+        .scattered-photo:hover { box-shadow: 0 8px 22px rgba(0,0,0,0.4); z-index: 100; }
+        .scattered-photo.dragging { cursor: grabbing; box-shadow: 0 12px 30px rgba(0,0,0,0.5); z-index: 200; transform: scale(1.05); }
+        .scattered-photo img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 2px; pointer-events: none; }
+        .scattered-photo .photo-text { font-size: 7px; color: #999; text-align: center; padding: 3px 0; font-style: italic; pointer-events: none; }
+
+        /* Tab Bar */
+        .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: calc(80px + var(--safe-bottom)); padding-bottom: var(--safe-bottom); background: var(--theme-glass); backdrop-filter: blur(40px); border-top: 0.5px solid var(--theme-border); display: flex; justify-content: space-around; align-items: center; z-index: 200; }
+        .tab-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px; background: transparent; border: none; color: var(--theme-text-secondary); cursor: pointer; transition: all 0.1s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .tab-item:active { transform: scale(0.92); }
+        .tab-item.active { color: var(--theme-highlight); }
+        .tab-icon { font-size: 23px; }
+        .tab-label { font-size: 10px; font-weight: 600; }
+
+        /* 頁面視圖 */
+        .page-view { position: absolute; inset: 0; background: var(--theme-primary); z-index: 300; transform: translateX(100%); transition: transform 0.4s var(--ease-out); display: flex; flex-direction: column; }
+        .page-view.active { transform: translateX(0); }
+        .page-header { height: calc(var(--safe-top) + 54px); padding-top: var(--safe-top); background: var(--theme-glass); backdrop-filter: blur(30px); border-bottom: 0.5px solid var(--theme-border); display: flex; align-items: center; justify-content: space-between; padding-left: 14px; padding-right: 14px; }
+        .page-title { font-size: 16px; font-weight: 700; }
+        .page-btn { padding: 8px 12px; background: transparent; border: none; color: var(--theme-highlight); font-size: 15px; cursor: pointer; font-weight: 500; }
+        .page-content { flex: 1; overflow-y: auto; padding: 14px; padding-bottom: calc(14px + var(--safe-bottom)); }
+
+        /* 相簿 */
+        .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+        .photo-thumb { aspect-ratio: 1; background: var(--theme-secondary); cursor: pointer; overflow: hidden; position: relative; border-radius: 3px; }
+        .photo-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.2s; }
+        .photo-thumb:active img { transform: scale(1.05); }
+        .photo-thumb .upload-badge { position: absolute; top: 4px; right: 4px; font-size: 11px; background: rgba(0,0,0,0.5); padding: 2px 5px; border-radius: 7px; }
+        .photo-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 45px 18px; color: var(--theme-text-secondary); gap: 10px; }
+        .photo-empty-icon { font-size: 52px; opacity: 0.5; }
+        .storage-stats { background: var(--theme-glass); border-radius: 13px; padding: 13px; margin-bottom: 14px; }
+        .storage-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--theme-border); font-size: 13px; }
+        .storage-row:last-child { border-bottom: none; }
+        .storage-label { color: var(--theme-text-secondary); }
+        .storage-value { color: var(--theme-highlight); font-weight: 600; }
+
+        /* 照片檢視器 */
+        .photo-viewer { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 400; display: none; flex-direction: column; }
+        .photo-viewer.active { display: flex; }
+        .viewer-header { height: calc(var(--safe-top) + 54px); padding-top: var(--safe-top); display: flex; align-items: center; justify-content: space-between; padding: 0 14px; padding-top: var(--safe-top); }
+        .viewer-content { flex: 1; display: flex; align-items: center; justify-content: center; padding: 14px; overflow: hidden; }
+        .viewer-image { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 5px; }
+        .viewer-actions { padding: 14px; padding-bottom: calc(14px + var(--safe-bottom)); display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+        .viewer-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; background: transparent; border: none; color: #fff; font-size: 10px; cursor: pointer; padding: 8px 12px; }
+        .viewer-btn-icon { font-size: 22px; }
+        .viewer-ai-result { position: absolute; bottom: 125px; left: 14px; right: 14px; background: var(--theme-glass); backdrop-filter: blur(20px); border-radius: 13px; padding: 13px; max-height: 150px; overflow-y: auto; display: none; }
+        .viewer-ai-result.active { display: block; }
+        .viewer-ai-result h4 { font-size: 12px; margin-bottom: 5px; color: var(--ios-purple); }
+        .viewer-ai-result p { font-size: 11px; line-height: 1.5; color: #fff; }
+
+        /* 設定頁面 */
+        .settings-section { background: var(--theme-glass); border-radius: 13px; margin-bottom: 14px; overflow: hidden; }
+        .settings-header { padding: 11px 14px; font-size: 11px; font-weight: 600; color: var(--theme-text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .settings-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-bottom: 0.5px solid var(--theme-border); }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-label { display: flex; align-items: center; gap: 9px; flex: 1; }
+        .settings-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; color: #fff; }
+        .settings-text { display: flex; flex-direction: column; }
+        .settings-text-main { font-size: 13px; }
+        .settings-text-sub { font-size: 10px; color: var(--theme-text-secondary); }
+        .settings-value { color: var(--theme-text-secondary); font-size: 13px; }
+        .ios-switch { width: 46px; height: 28px; background: var(--theme-accent); border-radius: 14px; position: relative; cursor: pointer; transition: background 0.3s; flex-shrink: 0; }
+        .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 24px; height: 24px; background: #fff; border-radius: 50%; transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .ios-switch.active { background: var(--ios-green); }
+        .ios-switch.active::after { transform: translateX(18px); }
+        .input-field { width: 100%; padding: 10px 12px; background: var(--theme-secondary); border: 1px solid var(--theme-border); border-radius: 9px; color: var(--theme-text); font-size: 13px; outline: none; transition: border-color 0.2s; }
+        .input-field:focus { border-color: var(--theme-highlight); }
+        .input-field::placeholder { color: var(--theme-text-secondary); }
+        .btn { width: 100%; padding: 11px; background: var(--theme-highlight); color: #fff; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .btn:active { transform: scale(0.97); opacity: 0.85; }
+        .btn-sm { padding: 8px 12px; font-size: 12px; }
+        .btn-outline { background: transparent; border: 1px solid var(--theme-border); color: var(--theme-text); }
+        .btn-google { background: #4285F4; }
+        .btn-line { background: #06C755; }
+        .btn-danger { background: transparent; border: 1px solid var(--ios-red); color: var(--ios-red); }
+        .btn-danger-outline { background: transparent; border: 1px solid var(--ios-red); color: var(--ios-red); }
+        
+        /* 輸入框帶顯示/隱藏切換 */
+        .input-with-toggle { position: relative; display: flex; align-items: center; }
+        .input-with-toggle .input-field { padding-right: 45px; }
+        .toggle-visibility { position: absolute; right: 8px; background: none; border: none; font-size: 18px; cursor: pointer; padding: 8px; opacity: 0.6; transition: opacity 0.2s; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+        .toggle-visibility:active { opacity: 1; }
+        .auth-status { padding: 9px 12px; border-radius: 9px; font-size: 12px; }
+        .auth-status.success { background: rgba(52,199,89,0.2); color: var(--ios-green); }
+        .auth-status.error { background: rgba(255,59,48,0.2); color: var(--ios-red); }
+
+        /* 主題選擇器 */
+        .theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px; }
+        .theme-option { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; }
+        .theme-preview { width: 42px; height: 42px; border-radius: 50%; border: 3px solid transparent; box-shadow: 0 2px 7px rgba(0,0,0,0.2); transition: all 0.2s; }
+        .theme-option.active .theme-preview { border-color: var(--theme-highlight); transform: scale(1.1); }
+        .theme-name { font-size: 9px; color: var(--theme-text-secondary); text-align: center; }
+        .theme-preview.black-titanium { background: linear-gradient(145deg, #3A3A3C, #1D1D1F); }
+        .theme-preview.white-titanium { background: linear-gradient(145deg, #FFFFFF, #E8E8ED); }
+        .theme-preview.natural-titanium { background: linear-gradient(145deg, #C4C0B6, #ADA99F); }
+        .theme-preview.desert-titanium { background: linear-gradient(145deg, #D4C9B5, #BFB5A0); }
+        .theme-preview.blue-titanium { background: linear-gradient(145deg, #4A5568, #394867); }
+        .theme-preview.pink { background: linear-gradient(145deg, #FCEAF0, #F9D5E5); }
+        .theme-preview.mint { background: linear-gradient(145deg, #DFF0E8, #C8E6D5); }
+        .theme-preview.sky { background: linear-gradient(145deg, #D0E4F0, #B8D4E8); }
+
+        /* Toast & Flash */
+        .flash-overlay { position: fixed; inset: 0; background: #fff; z-index: 600; opacity: 0; pointer-events: none; transition: opacity 0.1s; }
+        .flash-overlay.active { opacity: 1; }
+        .toast { position: fixed; bottom: calc(92px + var(--safe-bottom)); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--theme-glass); backdrop-filter: blur(20px); padding: 9px 18px; border-radius: 22px; display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 500; opacity: 0; transition: all 0.35s var(--spring); z-index: 500; pointer-events: none; border: 1px solid var(--theme-border); }
+        .toast.active { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .upload-progress { position: fixed; bottom: calc(92px + var(--safe-bottom)); left: 14px; right: 14px; background: var(--theme-glass); backdrop-filter: blur(20px); padding: 12px; border-radius: 12px; z-index: 500; display: none; border: 1px solid var(--theme-border); font-size: 13px; }
+        .upload-progress.active { display: block; }
+        .progress-bar { height: 5px; background: var(--theme-secondary); border-radius: 3px; margin-top: 9px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--ios-blue), var(--ios-green)); transition: width 0.3s; }
+    </style>
+</head>
+<body class="theme-sky">
+    <!-- 開機動畫 -->
+    <div class="boot-screen" id="bootScreen">
+        <div class="boot-logo">
+            <div class="boot-ring boot-ring-1"></div>
+            <div class="boot-ring boot-ring-2"></div>
+            <div class="boot-ring boot-ring-3"></div>
+            <div class="boot-camera">
+                <div class="boot-camera-body">
+                    <div class="boot-shutter"></div>
+                    <div class="boot-flash"></div>
+                    <div class="boot-lens"></div>
+                </div>
+            </div>
+        </div>
+        <div class="boot-title">AI 拍立得</div>
+        <div class="boot-subtitle">INSTAX CAMERA</div>
+        <div class="boot-progress"><div class="boot-progress-bar" id="bootProgressBar"></div></div>
+        <div class="boot-status" id="bootStatus">正在初始化...</div>
+        <div class="boot-version">v3.0.0 • iPhone 17 Edition</div>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <div class="status-bar">
+            <div class="dynamic-island" id="dynamicIsland">
+                <span class="island-icon">📷</span>
+                <span id="islandText">AI 拍立得 v3</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="camera-page" id="cameraPage">
+                <div class="scattered-photos" id="scatteredPhotos"></div>
+                
+                <div class="camera-body" id="cameraBody" onclick="checkAndRestoreCamera()">
+                    <div class="cam-flash" id="camFlash"></div>
+                    <div class="cam-viewfinder"></div>
+                    <div class="shutter-socket"><button class="shutter-btn" id="shutterBtn" ontouchstart="takePhoto()" onclick="takePhoto()"></button></div>
+                    <div class="lens-mount">
+                        <div class="lens-ring-outer">
+                            <div class="lens-text">
+                                <svg viewBox="0 0 200 200">
+                                    <path id="lensCurve" d="M 100, 100 m -70, 0 a 70,70 0 1,1 140,0 a 70,70 0 1,1 -140,0" fill="none"/>
+                                    <text><textPath href="#lensCurve">INSTAX LENS 60mm f/12.7 • AI POWERED</textPath></text>
+                                </svg>
+                            </div>
+                            <div class="lens-glass" onclick="checkAndRestoreCamera(); event.stopPropagation();" style="cursor: pointer;">
+                                <video id="cameraPreview" autoplay playsinline muted></video>
+                                <div class="lens-glass-shine"></div>
+                                <div class="lens-tap-hint" id="lensTapHint">點擊恢復</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cam-brand">
+                        <div class="cam-brand-name">instax</div>
+                        <div class="cam-brand-model">mini AI</div>
+                    </div>
+                    <div class="film-counter" id="filmCounter">10</div>
+                    <div class="cam-controls">
+                        <button class="cam-ctrl-btn" id="flashBtn" ontouchstart="toggleFlash()" onclick="toggleFlash()">⚡</button>
+                        <button class="cam-ctrl-btn" id="timerBtn" ontouchstart="cycleTimer()" onclick="cycleTimer()">⏱</button>
+                        <button class="cam-ctrl-btn" id="flipBtn" ontouchstart="flipCamera()" onclick="flipCamera()">🔄</button>
+                        <button class="cam-ctrl-btn" id="filterBtn" ontouchstart="cycleFilter()" onclick="cycleFilter()">🎨</button>
+                    </div>
+                </div>
+                
+                <div class="frame-selector">
+                    <span class="frame-selector-label">📷 選擇花邊樣式</span>
+                    <div class="frame-options" id="frameOptions">
+                        <div class="frame-option frame-white selected" data-frame="white" ontouchstart="selectFrame('white', this)" onclick="selectFrame('white', this)"></div>
+                        <div class="frame-option frame-black" data-frame="black" ontouchstart="selectFrame('black', this)" onclick="selectFrame('black', this)"></div>
+                        <div class="frame-option frame-mint" data-frame="mint" ontouchstart="selectFrame('mint', this)" onclick="selectFrame('mint', this)"></div>
+                        <div class="frame-option frame-pink" data-frame="pink" ontouchstart="selectFrame('pink', this)" onclick="selectFrame('pink', this)"></div>
+                        <div class="frame-option frame-floral" data-frame="floral" ontouchstart="selectFrame('floral', this)" onclick="selectFrame('floral', this)"></div>
+                        <div class="frame-option frame-plaid" data-frame="plaid" ontouchstart="selectFrame('plaid', this)" onclick="selectFrame('plaid', this)"></div>
+                        <div class="frame-option frame-gradient" data-frame="gradient" ontouchstart="selectFrame('gradient', this)" onclick="selectFrame('gradient', this)"></div>
+                    </div>
+                </div>
+                
+                <div class="polaroid-film frame-white" id="polaroidFilm">
+                    <div class="polaroid-image-area">
+                        <img id="filmImage" src="" alt="Photo">
+                        <div class="polaroid-developing" id="filmDeveloping">沖洗中...</div>
+                    </div>
+                    <div class="polaroid-photo-text" id="filmText">Memories ✨</div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="tab-bar">
+            <button class="tab-item active" data-tab="camera" ontouchstart="switchTab('camera')" onclick="switchTab('camera')"><span class="tab-icon">📷</span><span class="tab-label">相機</span></button>
+            <button class="tab-item" data-tab="gallery" ontouchstart="switchTab('gallery')" onclick="switchTab('gallery')"><span class="tab-icon">🖼️</span><span class="tab-label">相簿</span></button>
+            <button class="tab-item" data-tab="cloud" ontouchstart="switchTab('cloud')" onclick="switchTab('cloud')"><span class="tab-icon">☁️</span><span class="tab-label">雲端</span></button>
+            <button class="tab-item" data-tab="settings" ontouchstart="switchTab('settings')" onclick="switchTab('settings')"><span class="tab-icon">⚙️</span><span class="tab-label">設定</span></button>
+        </nav>
+
+        <!-- 相簿頁面 -->
+        <div class="page-view" id="galleryPage">
+            <div class="page-header">
+                <button class="page-btn" onclick="closePage('gallery')">← 返回</button>
+                <span class="page-title">我的照片</span>
+                <button class="page-btn" onclick="clearAllPhotos()">清除</button>
+            </div>
+            <div class="page-content">
+                <div class="storage-stats">
+                    <div class="storage-row"><span class="storage-label">📷 照片數量</span><span class="storage-value" id="photoCount">0</span></div>
+                    <div class="storage-row"><span class="storage-label">☁️ 已上傳</span><span class="storage-value" id="uploadedCount">0</span></div>
+                    <div class="storage-row"><span class="storage-label">⏳ 待上傳</span><span class="storage-value" id="pendingCount">0</span></div>
+                </div>
+                
+                <!-- 上傳到 Google 相簿 -->
+                <div class="settings-section" style="margin-bottom: 14px;">
+                    <div class="settings-header">☁️ 上傳到 GOOGLE 相簿</div>
+                    <div style="padding: 8px 14px 4px; font-size: 11px; color: var(--theme-text-secondary);">僅上傳照片，作為雲端備份紀念</div>
+                    <div style="padding: 8px 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-google" style="flex: 1;" ontouchstart="uploadAllPending()" onclick="uploadAllPending()">📤 上傳照片</button>
+                    </div>
+                </div>
+                
+                <!-- 匯出到文件 -->
+                <div class="settings-section" style="margin-bottom: 14px;">
+                    <div class="settings-header">📄 匯出到 GOOGLE 文件</div>
+                    <div style="padding: 8px 14px 4px; font-size: 11px; color: var(--theme-text-secondary);">圖文並茂，包含照片 + AI 描述 + 拍攝資訊</div>
+                    <div style="padding: 8px 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn" style="flex: 1; background: #4285F4;" ontouchstart="exportToGoogleDocs()" onclick="exportToGoogleDocs()">📝 匯出圖文相簿</button>
+                    </div>
+                </div>
+                
+                <!-- 本機下載 -->
+                <div class="settings-section" style="margin-bottom: 14px;">
+                    <div class="settings-header">💾 本機下載</div>
+                    <div style="padding: 12px 14px; display: flex; gap: 8px;">
+                        <button class="btn btn-outline" style="flex: 1;" ontouchstart="downloadAllPhotos()" onclick="downloadAllPhotos()">⬇️ 下載全部照片</button>
+                    </div>
+                </div>
+                
+                <!-- 雲端查閱 -->
+                <div class="settings-section" style="margin-bottom: 14px;">
+                    <div class="settings-header">🔗 雲端查閱</div>
+                    <div style="padding: 12px 14px; display: flex; gap: 8px;">
+                        <button class="btn btn-outline" style="flex: 1;" ontouchstart="openGooglePhotos()" onclick="openGooglePhotos()">📷 開啟雲端相簿</button>
+                        <button class="btn btn-outline" style="flex: 1;" ontouchstart="openGoogleDocs()" onclick="openGoogleDocs()">📄 開啟雲端文件</button>
+                    </div>
+                </div>
+                
+                <div class="photo-grid" id="photoGrid"></div>
+                <div class="photo-empty" id="photoEmpty">
+                    <span class="photo-empty-icon">📷</span>
+                    <span>還沒有照片</span>
+                    <span style="font-size: 12px; opacity: 0.6;">拍攝的照片會顯示在這裡</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 雲端頁面 -->
+        <div class="page-view" id="cloudPage">
+            <div class="page-header">
+                <button class="page-btn" onclick="closePage('cloud')">← 返回</button>
+                <span class="page-title">雲端同步</span>
+                <span></span>
+            </div>
+            <div class="page-content">
+                <div class="settings-section">
+                    <div class="settings-header">📷 Google 整合（24小時授權）</div>
+                    <div style="padding: 8px 14px; font-size: 11px; color: var(--theme-text-secondary); background: var(--theme-secondary); margin: 0 14px 12px; border-radius: 8px;">
+                        需要的權限：<br>
+                        ✅ Google 相簿（上傳照片）<br>
+                        ✅ Google Docs（建立文件）<br>
+                        ✅ Google Drive（圖片插入 Docs）<br><br>
+                        ⚠️ 首次使用或權限不足請點「重新授權」
+                    </div>
+                    
+                    <!-- Google Client ID -->
+                    <div class="settings-item"><div class="settings-label"><div class="settings-icon" style="background: #4285F4;">G</div><span>Client ID</span></div></div>
+                    <div style="padding: 0 14px 8px;">
+                        <div class="input-with-toggle">
+                            <input type="password" class="input-field" id="googleClientId" placeholder="輸入 Google OAuth Client ID">
+                            <button class="toggle-visibility" ontouchstart="toggleFieldVisibility('googleClientId')" onclick="toggleFieldVisibility('googleClientId')">👁️</button>
+                        </div>
+                    </div>
+                    <div style="padding: 0 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-sm" style="flex: 1;" ontouchstart="saveField('googleClientId')" onclick="saveField('googleClientId')">💾 儲存</button>
+                        <button class="btn btn-sm btn-danger-outline" style="flex: 1;" ontouchstart="clearField('googleClientId')" onclick="clearField('googleClientId')">🗑️ 清除</button>
+                    </div>
+                    
+                    <div id="googleAuthStatus" class="auth-status" style="display: none; margin: 0 14px 12px;"></div>
+                    <div style="padding: 0 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-google" style="flex: 1;" ontouchstart="authorizeGoogle()" onclick="authorizeGoogle()">🔑 授權</button>
+                        <button class="btn btn-outline" style="flex: 1;" ontouchstart="reauthorizeGoogle()" onclick="reauthorizeGoogle()">🔄 重新授權</button>
+                    </div>
+                    <div style="padding: 0 14px 12px;">
+                        <button class="btn btn-danger" ontouchstart="clearGoogleAuth()" onclick="clearGoogleAuth()">🗑️ 清除所有 Google 授權</button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <div class="settings-header">💬 LINE 通知</div>
+                    
+                    <!-- GAS URL -->
+                    <div class="settings-item"><div class="settings-label"><div class="settings-icon" style="background: #06C755;">🌐</div><span>GAS URL</span></div></div>
+                    <div style="padding: 0 14px 8px;">
+                        <div class="input-with-toggle">
+                            <input type="password" class="input-field" id="lineGasUrl" placeholder="Google Apps Script 網址">
+                            <button class="toggle-visibility" ontouchstart="toggleFieldVisibility('lineGasUrl')" onclick="toggleFieldVisibility('lineGasUrl')">👁️</button>
+                        </div>
+                    </div>
+                    <div style="padding: 0 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-sm" style="flex: 1;" ontouchstart="saveField('lineGasUrl')" onclick="saveField('lineGasUrl')">💾 儲存</button>
+                        <button class="btn btn-sm btn-danger-outline" style="flex: 1;" ontouchstart="clearField('lineGasUrl')" onclick="clearField('lineGasUrl')">🗑️ 清除</button>
+                    </div>
+                    
+                    <!-- GAS Secret -->
+                    <div class="settings-item"><div class="settings-label"><div class="settings-icon" style="background: #06C755;">🔐</div><span>GAS Secret</span></div></div>
+                    <div style="padding: 0 14px 8px;">
+                        <div class="input-with-toggle">
+                            <input type="password" class="input-field" id="lineGasSecret" placeholder="GAS 驗證密鑰">
+                            <button class="toggle-visibility" ontouchstart="toggleFieldVisibility('lineGasSecret')" onclick="toggleFieldVisibility('lineGasSecret')">👁️</button>
+                        </div>
+                    </div>
+                    <div style="padding: 0 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-sm" style="flex: 1;" ontouchstart="saveField('lineGasSecret')" onclick="saveField('lineGasSecret')">💾 儲存</button>
+                        <button class="btn btn-sm btn-danger-outline" style="flex: 1;" ontouchstart="clearField('lineGasSecret')" onclick="clearField('lineGasSecret')">🗑️ 清除</button>
+                    </div>
+                    
+                    <!-- LINE Token -->
+                    <div class="settings-item"><div class="settings-label"><div class="settings-icon" style="background: #06C755;">🎫</div><span>LINE Token</span></div></div>
+                    <div style="padding: 0 14px 8px;">
+                        <div class="input-with-toggle">
+                            <input type="password" class="input-field" id="lineToken" placeholder="LINE Messaging API Token">
+                            <button class="toggle-visibility" ontouchstart="toggleFieldVisibility('lineToken')" onclick="toggleFieldVisibility('lineToken')">👁️</button>
+                        </div>
+                    </div>
+                    <div style="padding: 0 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-sm" style="flex: 1;" ontouchstart="saveField('lineToken')" onclick="saveField('lineToken')">💾 儲存</button>
+                        <button class="btn btn-sm btn-danger-outline" style="flex: 1;" ontouchstart="clearField('lineToken')" onclick="clearField('lineToken')">🗑️ 清除</button>
+                    </div>
+                    
+                    <!-- LINE User ID -->
+                    <div class="settings-item"><div class="settings-label"><div class="settings-icon" style="background: #06C755;">👤</div><span>LINE User ID</span></div></div>
+                    <div style="padding: 0 14px 8px;">
+                        <div class="input-with-toggle">
+                            <input type="password" class="input-field" id="lineUserId" placeholder="你的 LINE User ID">
+                            <button class="toggle-visibility" ontouchstart="toggleFieldVisibility('lineUserId')" onclick="toggleFieldVisibility('lineUserId')">👁️</button>
+                        </div>
+                    </div>
+                    <div style="padding: 0 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-sm" style="flex: 1;" ontouchstart="saveField('lineUserId')" onclick="saveField('lineUserId')">💾 儲存</button>
+                        <button class="btn btn-sm btn-danger-outline" style="flex: 1;" ontouchstart="clearField('lineUserId')" onclick="clearField('lineUserId')">🗑️ 清除</button>
+                    </div>
+                    
+                    <div id="lineStatus" class="auth-status" style="display: none; margin: 0 14px 12px;"></div>
+                    <div style="padding: 0 14px 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-line" style="flex: 1;" ontouchstart="testLineNotification()" onclick="testLineNotification()">📤 測試通知</button>
+                    </div>
+                    <div style="padding: 0 14px 12px;">
+                        <button class="btn btn-danger" ontouchstart="clearAllLineSettings()" onclick="clearAllLineSettings()">🗑️ 清除所有 LINE 設定</button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <div class="settings-header">⚙️ 上傳設定</div>
+                    <div class="settings-item">
+                        <div class="settings-label"><div class="settings-icon" style="background: var(--ios-green);">📤</div><span>拍照後自動上傳</span></div>
+                        <div class="ios-switch" id="autoUploadSwitch" ontouchstart="toggleSetting('autoUpload')" onclick="toggleSetting('autoUpload')"></div>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label"><div class="settings-icon" style="background: var(--ios-blue);">💬</div><span>上傳後 LINE 通知</span></div>
+                        <div class="ios-switch active" id="lineNotifySwitch" ontouchstart="toggleSetting('lineNotify')" onclick="toggleSetting('lineNotify')"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 設定頁面 -->
+        <div class="page-view" id="settingsPage">
+            <div class="page-header">
+                <button class="page-btn" onclick="closePage('settings')">← 返回</button>
+                <span class="page-title">設定</span>
+                <span></span>
+            </div>
+            <div class="page-content">
+                <div class="settings-section">
+                    <div class="settings-header">🎨 iPhone 17 主題</div>
+                    <div class="theme-grid" id="themeGrid"></div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-header">🤖 AI 設定</div>
+                    <div class="settings-item">
+                        <div class="settings-label">
+                            <div class="settings-icon" style="background: var(--ios-purple);">🔑</div>
+                            <div class="settings-text"><span class="settings-text-main">Gemini API Key</span><span class="settings-text-sub">用於 AI 照片描述</span></div>
+                        </div>
+                        <button class="page-btn" onclick="showAPIKeyInput()">設定 →</button>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label"><div class="settings-icon" style="background: var(--ios-green);">✓</div><span>API 狀態</span></div>
+                        <span class="settings-value" id="apiStatus">未連接</span>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-header">📷 相機設定</div>
+                    <div class="settings-item">
+                        <div class="settings-label"><div class="settings-icon" style="background: var(--ios-orange);">🔊</div><span>快門聲音</span></div>
+                        <div class="ios-switch active" id="soundSwitch" onclick="toggleSetting('sound')"></div>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-header">💾 儲存空間</div>
+                    <div class="settings-item">
+                        <div class="settings-label"><div class="settings-icon" style="background: var(--ios-teal);">💾</div><span>儲存方式</span></div>
+                        <span class="settings-value">IndexedDB</span>
+                    </div>
+                    <div class="settings-item">
+                        <div class="settings-label"><div class="settings-icon" style="background: var(--ios-orange);">📊</div><span>照片容量</span></div>
+                        <span class="settings-value" id="storageSize">計算中...</span>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <div class="settings-header">關於</div>
+                    <div class="settings-item">
+                        <div class="settings-label"><div class="settings-icon" style="background: var(--ios-teal);">ℹ️</div><span>版本</span></div>
+                        <span class="settings-value">3.0.0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 照片檢視器 -->
+    <div class="photo-viewer" id="photoViewer">
+        <div class="viewer-header">
+            <button class="page-btn" onclick="closeViewer()">✕ 關閉</button>
+            <span id="viewerUploadStatus"></span>
+        </div>
+        <div class="viewer-content"><img class="viewer-image" id="viewerImage" src="" alt="Photo"></div>
+        <div class="viewer-ai-result" id="viewerAiResult"><h4>🤖 AI 描述</h4><p id="viewerAiText"></p></div>
+        <div class="viewer-actions">
+            <button class="viewer-btn" onclick="analyzeWithAI()"><span class="viewer-btn-icon">🤖</span><span>AI 分析</span></button>
+            <button class="viewer-btn" onclick="downloadCurrentPhoto()"><span class="viewer-btn-icon">⬇️</span><span>下載</span></button>
+            <button class="viewer-btn" onclick="uploadCurrentPhoto()"><span class="viewer-btn-icon">☁️</span><span>上傳</span></button>
+            <button class="viewer-btn" onclick="deleteCurrentPhoto()" style="color: var(--ios-red);"><span class="viewer-btn-icon">🗑️</span><span>刪除</span></button>
+        </div>
+    </div>
+
+    <div class="upload-progress" id="uploadProgress">
+        <div style="display: flex; justify-content: space-between;"><span id="uploadProgressText">上傳中...</span><span id="uploadProgressPercent">0%</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="uploadProgressFill" style="width: 0%;"></div></div>
+    </div>
+    <div class="flash-overlay" id="flashOverlay"></div>
+    <div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastText">已儲存</span></div>
+
+    <script>
+        let db = null;
+        const DB_NAME = 'AIPolaroidDB', DB_VERSION = 2, STORE_NAME = 'photos';
+        let stream = null, currentCamera = 'user';
+        let currentFilter = 'none', currentFrame = 'white', currentTheme = 'sky';
+        let timerSeconds = 0, filmCount = 10;
+        let flashEnabled = false, soundEnabled = true;
+        let autoUploadEnabled = false, lineNotifyEnabled = true;
+        let geminiApiKey = '', currentPhotoId = null;
+        const SCOPES = 'https://www.googleapis.com/auth/photoslibrary.appendonly https://www.googleapis.com/auth/documents https://www.googleapis.com/auth/drive.file';
+        const TOKEN_KEY = 'polaroid_google_token';
+        let tokenClient = null;
+        
+        // 防止按鈕重複觸發
+        let lastTouchTime = 0;
+        function preventDoubleTap(callback) {
+            const now = Date.now();
+            if (now - lastTouchTime < 300) return;
+            lastTouchTime = now;
+            callback();
+        }
+        
+        const filters = [
+            { id: 'none', name: '原始', css: '' },
+            { id: 'vintage', name: '復古', css: 'sepia(0.4) contrast(1.1) brightness(1.05)' },
+            { id: 'bw', name: '黑白', css: 'grayscale(1) contrast(1.1)' },
+            { id: 'warm', name: '暖色', css: 'sepia(0.2) saturate(1.3) brightness(1.05)' },
+            { id: 'cool', name: '冷色', css: 'saturate(0.9) brightness(1.1) hue-rotate(10deg)' },
+            { id: 'vivid', name: '鮮豔', css: 'contrast(1.1) saturate(1.5) brightness(1.05)' }
+        ];
+        const frames = { white: { class: 'frame-white', textColor: '#666' }, black: { class: 'frame-black', textColor: '#aaa' }, mint: { class: 'frame-mint', textColor: '#2d5a45' }, pink: { class: 'frame-pink', textColor: '#8b4557' }, floral: { class: 'frame-floral', textColor: '#8b6914' }, plaid: { class: 'frame-plaid', textColor: '#1e3a5f' }, gradient: { class: 'frame-gradient', textColor: '#5a3d7a' } };
+        const themes = [ { id: 'black-titanium', name: '黑鈦' }, { id: 'white-titanium', name: '白鈦' }, { id: 'natural-titanium', name: '原色鈦' }, { id: 'desert-titanium', name: '沙漠鈦' }, { id: 'blue-titanium', name: '藍鈦' }, { id: 'pink', name: '粉紅' }, { id: 'mint', name: '薄荷' }, { id: 'sky', name: '天藍' } ];
+
+        // IndexedDB
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => { db = request.result; resolve(db); };
+                request.onupgradeneeded = (e) => {
+                    const database = e.target.result;
+                    if (!database.objectStoreNames.contains(STORE_NAME)) {
+                        const store = database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        store.createIndex('timestamp', 'timestamp');
+                        store.createIndex('uploaded', 'uploaded');
+                    }
+                };
+            });
+        }
+        async function savePhotoToDB(photoData, frameType) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const photo = { id: Date.now(), data: photoData, timestamp: new Date().toISOString(), filter: currentFilter, frame: frameType || currentFrame, uploaded: false, googlePhotoId: null, aiDescription: null };
+                const req = store.add(photo);
+                req.onsuccess = () => resolve(photo);
+                req.onerror = () => reject(req.error);
+            });
+        }
+        async function getAllPhotos() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readonly');
+                const req = tx.objectStore(STORE_NAME).getAll();
+                req.onsuccess = () => resolve(req.result.sort((a, b) => b.id - a.id));
+                req.onerror = () => reject(req.error);
+            });
+        }
+        async function getPhoto(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readonly');
+                const req = tx.objectStore(STORE_NAME).get(id);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject(req.error);
+            });
+        }
+        async function updatePhoto(id, updates) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const getReq = store.get(id);
+                getReq.onsuccess = () => {
+                    const photo = { ...getReq.result, ...updates };
+                    const putReq = store.put(photo);
+                    putReq.onsuccess = () => resolve(photo);
+                    putReq.onerror = () => reject(putReq.error);
+                };
+            });
+        }
+        async function deletePhotoFromDB(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const req = tx.objectStore(STORE_NAME).delete(id);
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+        async function clearAllPhotosFromDB() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const req = tx.objectStore(STORE_NAME).clear();
+                req.onsuccess = () => resolve();
+                req.onerror = () => reject(req.error);
+            });
+        }
+
+        // Google OAuth
+        function isTokenValid() {
+            const tokenData = localStorage.getItem(TOKEN_KEY);
+            if (!tokenData) return false;
+            const { expiry } = JSON.parse(tokenData);
+            return expiry && Date.now() < expiry;
+        }
+        function getAccessToken() {
+            const tokenData = localStorage.getItem(TOKEN_KEY);
+            return tokenData ? JSON.parse(tokenData).access_token : null;
+        }
+        function saveGoogleToken(response) {
+            localStorage.setItem(TOKEN_KEY, JSON.stringify({ access_token: response.access_token, expiry: Date.now() + 24 * 60 * 60 * 1000 }));
+        }
+        function initTokenClient() {
+            const clientId = document.getElementById('googleClientId').value.trim();
+            if (!clientId) { showToast('⚠️', '請先輸入 Client ID'); return false; }
+            if (typeof google === 'undefined' || !google.accounts) { showToast('❌', 'Google API 尚未載入'); return false; }
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: clientId,
+                scope: SCOPES,
+                callback: (response) => {
+                    if (response.error) { showToast('❌', '授權失敗'); updateAuthStatus('error', '❌ 授權失敗'); return; }
+                    saveGoogleToken(response);
+                    updateAuthStatus('success', '✅ 已授權（24小時有效）');
+                    showToast('✅', 'Google 授權成功！');
+                    saveGoogleSettings();
+                }
+            });
+            return true;
+        }
+        function authorizeGoogle() {
+            if (isTokenValid()) { showToast('✅', '授權仍有效'); updateAuthStatus('success', '✅ 已授權（24小時有效）'); return; }
+            if (!initTokenClient()) return;
+            tokenClient.requestAccessToken({ prompt: '' });
+        }
+        function reauthorizeGoogle() {
+            if (!confirm('確定要重新授權嗎？')) return;
+            localStorage.removeItem(TOKEN_KEY);
+            if (!initTokenClient()) return;
+            tokenClient.requestAccessToken({ prompt: 'consent' });
+        }
+        function updateAuthStatus(type, message) {
+            const el = document.getElementById('googleAuthStatus');
+            el.style.display = 'block';
+            el.className = `auth-status ${type}`;
+            el.textContent = message;
+        }
+        function clearGoogleAuth() {
+            if (!confirm('確定要清除所有 Google 授權？')) return;
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem('polaroid_google');
+            document.getElementById('googleClientId').value = '';
+            document.getElementById('googleAuthStatus').style.display = 'none';
+            showToast('🗑️', 'Google 授權已清除');
+        }
+        
+        // 開啟 Google 相簿
+        function openGooglePhotos() {
+            window.open('https://photos.google.com/', '_blank');
+        }
+        
+        // 開啟 Google Docs（列出最近的文件）
+        function openGoogleDocs() {
+            window.open('https://docs.google.com/document/u/0/', '_blank');
+        }
+        
+        // 欄位獨立儲存
+        function saveField(fieldId) {
+            const value = document.getElementById(fieldId).value.trim();
+            const fieldSettings = JSON.parse(localStorage.getItem('polaroid_fields') || '{}');
+            fieldSettings[fieldId] = value;
+            localStorage.setItem('polaroid_fields', JSON.stringify(fieldSettings));
+            showToast('💾', '已儲存');
+        }
+        
+        // 欄位獨立清除
+        function clearField(fieldId) {
+            document.getElementById(fieldId).value = '';
+            const fieldSettings = JSON.parse(localStorage.getItem('polaroid_fields') || '{}');
+            delete fieldSettings[fieldId];
+            localStorage.setItem('polaroid_fields', JSON.stringify(fieldSettings));
+            showToast('🗑️', '已清除');
+        }
+        
+        // 隱碼切換
+        function toggleFieldVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field.type === 'password') {
+                field.type = 'text';
+            } else {
+                field.type = 'password';
+            }
+        }
+        
+        // 清除所有 LINE 設定
+        function clearAllLineSettings() {
+            if (!confirm('確定要清除所有 LINE 設定？')) return;
+            const fields = ['lineGasUrl', 'lineGasSecret', 'lineToken', 'lineUserId'];
+            fields.forEach(f => {
+                document.getElementById(f).value = '';
+            });
+            localStorage.removeItem('polaroid_line');
+            const fieldSettings = JSON.parse(localStorage.getItem('polaroid_fields') || '{}');
+            fields.forEach(f => delete fieldSettings[f]);
+            localStorage.setItem('polaroid_fields', JSON.stringify(fieldSettings));
+            document.getElementById('lineStatus').style.display = 'none';
+            showToast('🗑️', 'LINE 設定已全部清除');
+        }
+        
+        // 載入欄位設定
+        function loadFieldSettings() {
+            const fieldSettings = JSON.parse(localStorage.getItem('polaroid_fields') || '{}');
+            Object.keys(fieldSettings).forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.value = fieldSettings[fieldId];
+                }
+            });
+        }
+
+        // Google Photos Upload
+        async function uploadToGooglePhotos(photoData, photoId) {
+            if (!isTokenValid()) { showToast('⚠️', '請先授權 Google'); return { success: false }; }
+            const token = getAccessToken();
+            try {
+                updateIsland('☁️', '上傳中...');
+                const base64Data = photoData.split(',')[1];
+                const byteArray = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+                const uploadRes = await fetch('https://photoslibrary.googleapis.com/v1/uploads', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/octet-stream', 'X-Goog-Upload-Content-Type': 'image/jpeg', 'X-Goog-Upload-Protocol': 'raw' },
+                    body: byteArray
+                });
+                if (!uploadRes.ok) throw new Error('上傳失敗');
+                const uploadToken = await uploadRes.text();
+                const createRes = await fetch('https://photoslibrary.googleapis.com/v1/mediaItems:batchCreate', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ newMediaItems: [{ description: 'AI 拍立得', simpleMediaItem: { uploadToken } }] })
+                });
+                if (!createRes.ok) throw new Error('建立失敗');
+                const result = await createRes.json();
+                if (result.newMediaItemResults?.[0]?.status?.message === 'Success') {
+                    await updatePhoto(photoId, { uploaded: true, googlePhotoId: result.newMediaItemResults[0].mediaItem.id });
+                    updateIsland('📷', 'AI 拍立得 v3');
+                    return { success: true };
+                }
+                throw new Error('上傳失敗');
+            } catch (error) {
+                console.error('上傳錯誤:', error);
+                updateIsland('📷', 'AI 拍立得 v3');
+                showToast('❌', error.message);
+                return { success: false, error: error.message };
+            }
+        }
+
+        // Google Docs Export with Images
+        async function exportToGoogleDocs() {
+            const photos = await getAllPhotos();
+            if (photos.length === 0) { showToast('📷', '沒有照片可匯出'); return; }
+            
+            if (!isTokenValid()) { 
+                showToast('⚠️', '請先授權 Google（需重新授權）'); 
+                alert('匯出 Google Docs 需要額外權限。\n\n請到「雲端」頁面點擊「重新授權」按鈕。');
+                showPage('cloud'); 
+                return; 
+            }
+            
+            const token = getAccessToken();
+            updateIsland('📄', '匯出中...');
+            showUploadProgress('準備匯出...', 0);
+            
+            try {
+                // 1. 建立 Google Doc
+                showUploadProgress('建立文件...', 5);
+                const createRes = await fetch('https://docs.googleapis.com/v1/documents', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: `📷 AI 拍立得相簿 - ${new Date().toLocaleDateString('zh-TW')}` })
+                });
+                
+                if (createRes.status === 403 || createRes.status === 401) {
+                    throw new Error('缺少權限，請重新授權');
+                }
+                if (!createRes.ok) throw new Error('建立文件失敗');
+                
+                const doc = await createRes.json();
+                const docId = doc.documentId;
+                
+                // 2. 準備插入內容的 requests
+                let requests = [];
+                let currentIndex = 1;
+                
+                // 標題
+                const header = `📷 AI 拍立得相簿\n\n匯出時間：${new Date().toLocaleString('zh-TW')}\n照片數量：${photos.length} 張\n\n${'─'.repeat(40)}\n\n`;
+                requests.push({
+                    insertText: { location: { index: currentIndex }, text: header }
+                });
+                currentIndex += header.length;
+                
+                // 3. 逐張處理照片
+                for (let i = 0; i < photos.length; i++) {
+                    const photo = photos[i];
+                    const progress = 10 + (i / photos.length) * 80;
+                    showUploadProgress(`處理照片 ${i + 1}/${photos.length}...`, progress);
+                    
+                    // 上傳圖片到 Google Drive
+                    const imageUrl = await uploadImageToDrive(photo.data, token, `photo_${i + 1}.jpg`);
+                    
+                    if (imageUrl) {
+                        // 插入圖片
+                        requests.push({
+                            insertInlineImage: {
+                                location: { index: currentIndex },
+                                uri: imageUrl,
+                                objectSize: {
+                                    height: { magnitude: 200, unit: 'PT' },
+                                    width: { magnitude: 200, unit: 'PT' }
+                                }
+                            }
+                        });
+                        currentIndex += 1; // 圖片佔 1 個字元位置
+                    }
+                    
+                    // 照片資訊文字
+                    let photoInfo = `\n\n📸 照片 ${i + 1}\n`;
+                    photoInfo += `⏰ 時間：${new Date(photo.timestamp).toLocaleString('zh-TW')}\n`;
+                    photoInfo += `🎨 濾鏡：${filters.find(f => f.id === photo.filter)?.name || '原始'}\n`;
+                    photoInfo += `🖼️ 花邊：${photo.frame || 'white'}\n`;
+                    photoInfo += `☁️ 狀態：${photo.uploaded ? '已上傳雲端' : '本機儲存'}\n`;
+                    
+                    if (photo.aiDescription) {
+                        photoInfo += `\n🤖 AI 描述：\n${photo.aiDescription}\n`;
+                    }
+                    
+                    photoInfo += `\n${'─'.repeat(40)}\n\n`;
+                    
+                    requests.push({
+                        insertText: { location: { index: currentIndex }, text: photoInfo }
+                    });
+                    currentIndex += photoInfo.length;
+                    
+                    // 短暫延遲避免 API 限制
+                    await new Promise(r => setTimeout(r, 300));
+                }
+                
+                // 4. 批次更新文件
+                showUploadProgress('寫入文件...', 95);
+                const updateRes = await fetch(`https://docs.googleapis.com/v1/documents/${docId}:batchUpdate`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ requests })
+                });
+                
+                if (!updateRes.ok) {
+                    const errorData = await updateRes.json().catch(() => ({}));
+                    console.error('Update error:', errorData);
+                    throw new Error('更新文件失敗');
+                }
+                
+                hideUploadProgress();
+                updateIsland('📷', 'AI 拍立得 v3');
+                showToast('✅', '已匯出到 Google Docs（含圖片）');
+                
+                // 開啟文件
+                window.open(`https://docs.google.com/document/d/${docId}/edit`, '_blank');
+                
+            } catch (error) {
+                console.error('匯出錯誤:', error);
+                hideUploadProgress();
+                updateIsland('📷', 'AI 拍立得 v3');
+                showToast('❌', '匯出失敗：' + error.message);
+                alert(`匯出失敗：${error.message}\n\n請確認：\n1. 已啟用 Google Docs API\n2. 已啟用 Google Drive API\n3. 點擊「重新授權」取得所有權限`);
+            }
+        }
+        
+        // 上傳圖片到 Google Drive 並取得公開 URL
+        async function uploadImageToDrive(base64Data, token, fileName) {
+            try {
+                // 轉換 base64 為 blob
+                const base64 = base64Data.split(',')[1];
+                const byteCharacters = atob(base64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'image/jpeg' });
+                
+                // 建立 multipart form data
+                const metadata = {
+                    name: fileName,
+                    mimeType: 'image/jpeg'
+                };
+                
+                const form = new FormData();
+                form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+                form.append('file', blob);
+                
+                // 上傳到 Drive
+                const uploadRes = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: form
+                });
+                
+                if (!uploadRes.ok) {
+                    console.error('Drive upload failed:', await uploadRes.text());
+                    return null;
+                }
+                
+                const file = await uploadRes.json();
+                
+                // 設定為任何人可讀
+                await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}/permissions`, {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        role: 'reader',
+                        type: 'anyone'
+                    })
+                });
+                
+                // 回傳可用於 Docs 的圖片 URL
+                return `https://drive.google.com/uc?id=${file.id}`;
+                
+            } catch (error) {
+                console.error('上傳圖片失敗:', error);
+                return null;
+            }
+        }
+        
+        // 下載所有照片
+        async function downloadAllPhotos() {
+            const photos = await getAllPhotos();
+            if (photos.length === 0) { 
+                showToast('📷', '沒有照片可下載'); 
+                return; 
+            }
+            
+            if (photos.length > 10) {
+                if (!confirm(`共 ${photos.length} 張照片，將逐一下載。\n繼續嗎？`)) return;
+            }
+            
+            updateIsland('💾', '下載中...');
+            showToast('💾', `開始下載 ${photos.length} 張照片...`);
+            
+            for (let i = 0; i < photos.length; i++) {
+                const photo = photos[i];
+                const link = document.createElement('a');
+                const timestamp = new Date(photo.timestamp).toISOString().slice(0, 10);
+                link.download = `polaroid_${timestamp}_${i + 1}.jpg`;
+                link.href = photo.data;
+                link.click();
+                
+                // 間隔下載避免瀏覽器阻擋
+                await new Promise(r => setTimeout(r, 500));
+            }
+            
+            updateIsland('📷', 'AI 拍立得 v3');
+            showToast('✅', `已下載 ${photos.length} 張照片`);
+        }
+
+        // LINE Notification
+        async function sendLineNotification(message) {
+            const gasUrl = document.getElementById('lineGasUrl').value.trim();
+            const gasSecret = document.getElementById('lineGasSecret').value.trim();
+            const lineToken = document.getElementById('lineToken').value.trim();
+            const lineUserId = document.getElementById('lineUserId').value.trim();
+            if (!gasUrl || !gasSecret || !lineToken || !lineUserId) {
+                console.log('LINE 設定不完整');
+                return { success: false, error: '設定不完整' };
+            }
+            try {
+                const response = await fetch(gasUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ secret: gasSecret, token: lineToken, userId: lineUserId, message })
+                });
+                return { success: true };
+            } catch (error) {
+                console.error('LINE 通知錯誤:', error);
+                return { success: false, error: error.message };
+            }
+        }
+        async function testLineNotification() {
+            const gasUrl = document.getElementById('lineGasUrl').value.trim();
+            const gasSecret = document.getElementById('lineGasSecret').value.trim();
+            const lineToken = document.getElementById('lineToken').value.trim();
+            const lineUserId = document.getElementById('lineUserId').value.trim();
+            if (!gasUrl || !gasSecret || !lineToken || !lineUserId) {
+                showToast('⚠️', '請填寫完整 LINE 設定');
+                updateLineStatus('error', '❌ 設定不完整');
+                return;
+            }
+            updateLineStatus('', '📤 發送中...');
+            showToast('📤', '正在發送測試通知...');
+            const result = await sendLineNotification('🧪 測試通知\n\n📷 AI 拍立得 v3 已連接！\n✅ LINE 通知功能正常');
+            if (result.success) {
+                showToast('✅', '測試通知已發送（請檢查 LINE）');
+                updateLineStatus('success', '✅ 測試通知已發送');
+            } else {
+                showToast('⚠️', '已嘗試發送（no-cors 模式）');
+                updateLineStatus('success', '⚠️ 已發送（請檢查 LINE）');
+            }
+        }
+        function updateLineStatus(type, message) {
+            const el = document.getElementById('lineStatus');
+            el.style.display = 'block';
+            el.className = `auth-status ${type}`;
+            el.textContent = message;
+        }
+
+        async function uploadCurrentPhoto() {
+            if (!currentPhotoId) return;
+            const photo = await getPhoto(currentPhotoId);
+            if (!photo) return;
+            const result = await uploadToGooglePhotos(photo.data, currentPhotoId);
+            if (result.success) {
+                showToast('✅', '上傳成功！');
+                document.getElementById('viewerUploadStatus').textContent = '☁️ 已上傳';
+                if (lineNotifyEnabled) await sendLineNotification(`📷 照片已上傳！\n⏰ ${new Date().toLocaleString('zh-TW')}\n☁️ 已同步 Google 相簿`);
+                await updateGallery();
+            }
+        }
+        async function uploadAllPending() {
+            const photos = await getAllPhotos();
+            const pending = photos.filter(p => !p.uploaded);
+            if (pending.length === 0) { showToast('✅', '沒有待上傳照片'); return; }
+            if (!isTokenValid()) { showToast('⚠️', '請先授權 Google'); showPage('cloud'); return; }
+            showUploadProgress('準備上傳...', 0);
+            let success = 0;
+            for (let i = 0; i < pending.length; i++) {
+                showUploadProgress(`上傳中 ${i + 1}/${pending.length}`, ((i + 1) / pending.length) * 100);
+                const result = await uploadToGooglePhotos(pending[i].data, pending[i].id);
+                if (result.success) success++;
+                await new Promise(r => setTimeout(r, 500));
+            }
+            hideUploadProgress();
+            showToast('✅', `上傳完成：${success}/${pending.length}`);
+            if (lineNotifyEnabled && success > 0) await sendLineNotification(`📷 批次上傳完成！\n✅ 成功：${success} 張\n⏰ ${new Date().toLocaleString('zh-TW')}`);
+            await updateGallery();
+        }
+        function showUploadProgress(text, percent) {
+            document.getElementById('uploadProgressText').textContent = text;
+            document.getElementById('uploadProgressPercent').textContent = Math.round(percent) + '%';
+            document.getElementById('uploadProgressFill').style.width = percent + '%';
+            document.getElementById('uploadProgress').classList.add('active');
+        }
+        function hideUploadProgress() { document.getElementById('uploadProgress').classList.remove('active'); }
+
+        // AI Analysis
+        async function analyzeWithAI() {
+            if (!currentPhotoId) return;
+            if (!geminiApiKey) { showToast('⚠️', '請先設定 Gemini API Key'); return; }
+            const photo = await getPhoto(currentPhotoId);
+            if (!photo) return;
+            const aiResult = document.getElementById('viewerAiResult');
+            const aiText = document.getElementById('viewerAiText');
+            aiResult.classList.add('active');
+            aiText.textContent = '正在分析照片...';
+            try {
+                const base64Data = photo.data.split(',')[1];
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiApiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: 'image/jpeg', data: base64Data } }, { text: '請用繁體中文描述這張照片，包含：1. 主要內容（50字內）2. 情境氛圍 3. 適合的標題。簡潔有詩意。' }] }] })
+                });
+                const result = await res.json();
+                const description = result.candidates?.[0]?.content?.parts?.[0]?.text || '無法分析';
+                aiText.textContent = description;
+                await updatePhoto(currentPhotoId, { aiDescription: description });
+            } catch (error) { aiText.textContent = '分析失敗：' + error.message; }
+        }
+
+        // Camera
+        let cameraActive = false;
+        let isFlipping = false;
+        let flipTimeout = null;
+        
+        async function initCamera(facingMode) {
+            try {
+                // 停止現有串流
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                // 使用傳入的 facingMode 或當前設定
+                const facing = facingMode || currentCamera || 'user';
+                
+                console.log('初始化相機，鏡頭:', facing);
+                
+                // 設定 facingMode - 使用 exact 確保切換成功
+                let videoConstraints;
+                if (facing === 'environment') {
+                    // 後鏡頭 - 使用 exact 強制切換
+                    videoConstraints = {
+                        facingMode: { exact: 'environment' },
+                        width: { ideal: 720 },
+                        height: { ideal: 720 }
+                    };
+                } else {
+                    // 前鏡頭
+                    videoConstraints = {
+                        facingMode: 'user',
+                        width: { ideal: 720 },
+                        height: { ideal: 720 }
+                    };
+                }
+                
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: videoConstraints, 
+                        audio: false 
+                    });
+                } catch (exactError) {
+                    // 如果 exact 失敗，嘗試不用 exact
+                    console.log('exact 模式失敗，嘗試一般模式:', exactError);
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: facing,
+                            width: { ideal: 720 }, 
+                            height: { ideal: 720 } 
+                        }, 
+                        audio: false 
+                    });
+                }
+                
+                const video = document.getElementById('cameraPreview');
+                video.srcObject = stream;
+                
+                // 確保 video 開始播放
+                await video.play().catch(e => console.log('Video play:', e));
+                
+                cameraActive = true;
+                currentCamera = facing;
+                console.log('相機已啟動，鏡頭:', facing);
+                
+            } catch (error) { 
+                console.error('相機初始化失敗:', error); 
+                showToast('❌', '無法切換鏡頭'); 
+                cameraActive = false;
+            }
+        }
+        
+        // 相機休眠恢復 - 強制檢查
+        function checkAndRestoreCamera() {
+            // 切換中不要干擾
+            if (isFlipping) {
+                console.log('正在切換鏡頭，跳過檢查');
+                return;
+            }
+            
+            const video = document.getElementById('cameraPreview');
+            const hint = document.getElementById('lensTapHint');
+            if (!video) return;
+            
+            let needsRestart = false;
+            
+            // 檢查各種情況
+            if (!stream) {
+                console.log('串流不存在');
+                needsRestart = true;
+            } else if (!video.srcObject) {
+                console.log('video.srcObject 不存在');
+                needsRestart = true;
+            } else {
+                const tracks = stream.getVideoTracks();
+                if (tracks.length === 0) {
+                    console.log('沒有視訊軌道');
+                    needsRestart = true;
+                } else if (tracks.every(t => t.readyState === 'ended')) {
+                    console.log('所有軌道已結束');
+                    needsRestart = true;
+                } else if (tracks.every(t => !t.enabled)) {
+                    console.log('所有軌道被禁用');
+                    needsRestart = true;
+                }
+            }
+            
+            // 顯示/隱藏提示
+            if (hint) {
+                hint.style.opacity = needsRestart ? '1' : '0';
+            }
+            
+            // 額外檢查：video 是否暫停
+            if (!needsRestart && video.paused) {
+                console.log('video 已暫停，嘗試播放');
+                video.play().catch(() => {
+                    console.log('播放失敗，需要重新初始化');
+                    if (hint) hint.style.opacity = '1';
+                    initCamera(currentCamera);
+                });
+                return;
+            }
+            
+            if (needsRestart) {
+                console.log('重新初始化相機，鏡頭:', currentCamera);
+                showToast('📷', '恢復相機...');
+                initCamera(currentCamera).then(() => {
+                    if (hint) hint.style.opacity = '0';
+                }).catch(e => {
+                    console.error('恢復失敗:', e);
+                });
+            }
+        }
+        
+        function handleVisibilityChange() {
+            console.log('visibilitychange:', document.visibilityState);
+            if (document.visibilityState === 'visible') {
+                // 多次檢查，確保恢復
+                setTimeout(checkAndRestoreCamera, 100);
+                setTimeout(checkAndRestoreCamera, 500);
+                setTimeout(checkAndRestoreCamera, 1000);
+                setTimeout(checkAndRestoreCamera, 2000);
+            }
+        }
+        
+        function handleFocus() {
+            console.log('window focus');
+            setTimeout(checkAndRestoreCamera, 100);
+            setTimeout(checkAndRestoreCamera, 500);
+            setTimeout(checkAndRestoreCamera, 1500);
+        }
+        
+        // 監聽頁面可見性變化和視窗焦點
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+        window.addEventListener('pageshow', (e) => {
+            console.log('pageshow, persisted:', e.persisted);
+            setTimeout(checkAndRestoreCamera, 100);
+            setTimeout(checkAndRestoreCamera, 500);
+            setTimeout(checkAndRestoreCamera, 1500);
+        });
+        
+        // 全域點擊/觸控恢復
+        document.addEventListener('click', () => {
+            if (document.visibilityState === 'visible') {
+                checkAndRestoreCamera();
+            }
+        }, { passive: true });
+        
+        document.addEventListener('touchend', () => {
+            if (document.visibilityState === 'visible') {
+                checkAndRestoreCamera();
+            }
+        }, { passive: true });
+        
+        // 定期檢查相機狀態（每 2 秒）
+        setInterval(() => {
+            // 切換中不要自動恢復
+            if (isFlipping) return;
+            if (document.visibilityState === 'visible' && !document.hidden) {
+                checkAndRestoreCamera();
+            }
+        }, 2000);
+        
+        async function flipCamera() {
+            // 防止重複點擊
+            if (isFlipping) {
+                console.log('正在切換中，忽略');
+                return;
+            }
+            
+            isFlipping = true;
+            
+            // 超時保護：5秒後自動解鎖
+            flipTimeout = setTimeout(() => {
+                console.log('切換超時，強制解鎖');
+                isFlipping = false;
+            }, 5000);
+            
+            try {
+                const newCamera = currentCamera === 'user' ? 'environment' : 'user';
+                console.log('切換鏡頭:', currentCamera, '->', newCamera);
+                
+                showToast('🔄', newCamera === 'user' ? '切換前鏡頭...' : '切換後鏡頭...');
+                
+                // 先停止現有串流
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                    stream = null;
+                }
+                
+                await initCamera(newCamera);
+                
+                showToast('📷', currentCamera === 'user' ? '前鏡頭' : '後鏡頭');
+                saveSettings();
+                
+            } catch (e) {
+                console.error('切換失敗:', e);
+                showToast('❌', '切換失敗，請重試');
+            } finally {
+                clearTimeout(flipTimeout);
+                isFlipping = false;
+            }
+        }
+        function toggleFlash() {
+            flashEnabled = !flashEnabled;
+            document.getElementById('flashBtn').classList.toggle('active', flashEnabled);
+            showToast('⚡', flashEnabled ? '閃光燈開' : '閃光燈關');
+        }
+        function cycleTimer() {
+            const times = [0, 3, 5, 10];
+            timerSeconds = times[(times.indexOf(timerSeconds) + 1) % times.length];
+            document.getElementById('timerBtn').classList.toggle('active', timerSeconds > 0);
+            showToast('⏱', timerSeconds === 0 ? '計時器關閉' : `${timerSeconds} 秒`);
+        }
+        function cycleFilter() {
+            const idx = (filters.findIndex(f => f.id === currentFilter) + 1) % filters.length;
+            currentFilter = filters[idx].id;
+            document.getElementById('cameraPreview').style.filter = filters[idx].css;
+            document.getElementById('filterBtn').classList.toggle('active', currentFilter !== 'none');
+            showToast('🎨', filters[idx].name);
+        }
+        function selectFrame(frameId, el) {
+            currentFrame = frameId;
+            document.querySelectorAll('.frame-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        let isTakingPhoto = false;
+        
+        async function takePhoto() {
+            if (isTakingPhoto) return;
+            isTakingPhoto = true;
+            
+            try {
+                if (timerSeconds > 0) {
+                    for (let i = timerSeconds; i > 0; i--) { updateIsland('⏱', `${i} 秒`); await new Promise(r => setTimeout(r, 1000)); }
+                }
+                await capturePhoto();
+            } finally {
+                setTimeout(() => { isTakingPhoto = false; }, 500);
+            }
+        }
+        async function capturePhoto() {
+            const video = document.getElementById('cameraPreview');
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = Math.min(video.videoWidth, video.videoHeight);
+            canvas.width = size; canvas.height = size;
+            if (flashEnabled) {
+                document.getElementById('flashOverlay').classList.add('active');
+                document.getElementById('camFlash').style.boxShadow = '0 0 30px 10px rgba(255,255,255,0.8)';
+                setTimeout(() => { document.getElementById('flashOverlay').classList.remove('active'); document.getElementById('camFlash').style.boxShadow = ''; }, 150);
+            }
+            if (soundEnabled) playShutterSound();
+            ctx.save();
+            if (currentCamera === 'user') { ctx.scale(-1, 1); ctx.translate(-canvas.width, 0); }
+            const filter = filters.find(f => f.id === currentFilter);
+            if (filter && filter.css) ctx.filter = filter.css;
+            const offsetX = (video.videoWidth - size) / 2, offsetY = (video.videoHeight - size) / 2;
+            ctx.drawImage(video, offsetX, offsetY, size, size, 0, 0, size, size);
+            ctx.restore();
+            const imageData = canvas.toDataURL('image/jpeg', 0.85);
+            const polaroidData = await createPolaroidImage(imageData, currentFrame);
+            showFilmEject(polaroidData);
+            const photo = await savePhotoToDB(polaroidData, currentFrame);
+            filmCount = Math.max(0, filmCount - 1);
+            document.getElementById('filmCounter').textContent = filmCount;
+            setTimeout(() => createScatteredPhoto(polaroidData, photo.id), 3500);
+            await updateGallery();
+            if (autoUploadEnabled && isTokenValid()) {
+                setTimeout(async () => {
+                    const result = await uploadToGooglePhotos(polaroidData, photo.id);
+                    if (result.success) { showToast('☁️', '已自動上傳'); if (lineNotifyEnabled) await sendLineNotification(`📷 新照片已自動上傳！\n⏰ ${new Date().toLocaleString('zh-TW')}`); await updateGallery(); }
+                }, 4000);
+            }
+            updateIsland('📷', 'AI 拍立得 v3');
+        }
+        async function createPolaroidImage(imageData, frameType) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const padding = 30, bottomPadding = 80;
+                    canvas.width = img.width + padding * 2;
+                    canvas.height = img.height + padding + bottomPadding;
+                    const frameColors = { white: '#ffffff', black: '#1a1a1a', mint: '#a8e6cf', pink: '#ffb6c1', floral: '#ffefd5', plaid: '#b0c4de', gradient: null };
+                    if (frameType === 'gradient') {
+                        const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                        grad.addColorStop(0, '#ff9a9e'); grad.addColorStop(0.5, '#fecfef'); grad.addColorStop(1, '#a18cd1');
+                        ctx.fillStyle = grad;
+                    } else { ctx.fillStyle = frameColors[frameType] || '#ffffff'; }
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, padding, padding);
+                    resolve(canvas.toDataURL('image/jpeg', 0.9));
+                };
+                img.src = imageData;
+            });
+        }
+        function showFilmEject(imageData) {
+            const film = document.getElementById('polaroidFilm');
+            const filmImg = document.getElementById('filmImage');
+            const developing = document.getElementById('filmDeveloping');
+            const filmText = document.getElementById('filmText');
+            film.className = 'polaroid-film ' + frames[currentFrame].class;
+            filmText.style.color = frames[currentFrame].textColor;
+            filmImg.src = imageData;
+            filmImg.classList.remove('developed');
+            developing.classList.remove('hidden');
+            film.classList.add('ejecting');
+            setTimeout(() => { developing.classList.add('hidden'); filmImg.classList.add('developed'); }, 1500);
+            setTimeout(() => { film.classList.remove('ejecting'); showToast('📸', '照片已儲存'); }, 4000);
+        }
+
+        // 散落照片（可拖曳）
+        function createScatteredPhoto(imageData, photoId) {
+            const container = document.getElementById('scatteredPhotos');
+            const photo = document.createElement('div');
+            photo.className = 'scattered-photo';
+            photo.dataset.photoId = photoId;
+            const randomX = Math.random() * 60 + 10;
+            const randomY = Math.random() * 25 + 5;
+            const randomRotate = Math.random() * 30 - 15;
+            photo.style.cssText = `left: ${randomX}%; top: ${randomY}%; transform: rotate(${randomRotate}deg);`;
+            photo.innerHTML = `<img src="${imageData}" alt="Photo"><div class="photo-text">✨</div>`;
+            
+            // 拖曳功能
+            let isDragging = false, startX, startY, initialX, initialY;
+            
+            const onStart = (e) => {
+                e.preventDefault();
+                isDragging = true;
+                photo.classList.add('dragging');
+                const touch = e.touches ? e.touches[0] : e;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                const rect = photo.getBoundingClientRect();
+                initialX = rect.left;
+                initialY = rect.top;
+            };
+            
+            const onMove = (e) => {
+                if (!isDragging) return;
+                e.preventDefault();
+                const touch = e.touches ? e.touches[0] : e;
+                const deltaX = touch.clientX - startX;
+                const deltaY = touch.clientY - startY;
+                photo.style.left = `${initialX + deltaX}px`;
+                photo.style.top = `${initialY + deltaY}px`;
+                photo.style.transform = 'rotate(0deg) scale(1.05)';
+            };
+            
+            const onEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                photo.classList.remove('dragging');
+                photo.style.transform = `rotate(${randomRotate}deg)`;
+            };
+            
+            // 點擊查看（非拖曳時）
+            let clickTimer;
+            photo.addEventListener('mousedown', (e) => {
+                clickTimer = Date.now();
+                onStart(e);
+            });
+            photo.addEventListener('touchstart', (e) => {
+                clickTimer = Date.now();
+                onStart(e);
+            }, { passive: false });
+            
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('touchmove', onMove, { passive: false });
+            
+            document.addEventListener('mouseup', (e) => {
+                if (isDragging && Date.now() - clickTimer < 200) {
+                    viewPhoto(photoId);
+                }
+                onEnd();
+            });
+            document.addEventListener('touchend', (e) => {
+                if (isDragging && Date.now() - clickTimer < 200) {
+                    viewPhoto(photoId);
+                }
+                onEnd();
+            });
+            
+            container.appendChild(photo);
+            while (container.children.length > 5) container.removeChild(container.firstChild);
+        }
+
+        function playShutterSound() {
+            try {
+                const audio = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audio.createOscillator();
+                const gain = audio.createGain();
+                osc.connect(gain); gain.connect(audio.destination);
+                osc.frequency.value = 800;
+                gain.gain.setValueAtTime(0.3, audio.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audio.currentTime + 0.1);
+                osc.start(audio.currentTime); osc.stop(audio.currentTime + 0.1);
+            } catch(e) {}
+        }
+
+        // UI
+        function initThemeSelector() {
+            const grid = document.getElementById('themeGrid');
+            themes.forEach(t => {
+                const item = document.createElement('div');
+                item.className = `theme-option ${t.id === currentTheme ? 'active' : ''}`;
+                item.innerHTML = `<div class="theme-preview ${t.id}"></div><span class="theme-name">${t.name}</span>`;
+                item.onclick = () => selectTheme(t.id);
+                grid.appendChild(item);
+            });
+        }
+        function selectTheme(themeId) {
+            currentTheme = themeId;
+            document.body.className = `theme-${themeId}`;
+            document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('active', el.querySelector(`.theme-preview.${themeId}`)));
+            saveSettings();
+            showToast('🎨', themes.find(t => t.id === themeId)?.name);
+        }
+        async function updateGallery() {
+            const photos = await getAllPhotos();
+            const grid = document.getElementById('photoGrid');
+            const empty = document.getElementById('photoEmpty');
+            const uploadedCount = photos.filter(p => p.uploaded).length;
+            document.getElementById('photoCount').textContent = photos.length;
+            document.getElementById('uploadedCount').textContent = uploadedCount;
+            document.getElementById('pendingCount').textContent = photos.length - uploadedCount;
+            if (photos.length === 0) { grid.style.display = 'none'; empty.style.display = 'flex'; return; }
+            grid.style.display = 'grid'; empty.style.display = 'none';
+            grid.innerHTML = photos.map(p => `<div class="photo-thumb" onclick="viewPhoto(${p.id})"><img src="${p.data}" alt="Photo"><span class="upload-badge">${p.uploaded ? '☁️' : '📱'}</span></div>`).join('');
+            let totalSize = 0; photos.forEach(p => totalSize += p.data.length * 0.75);
+            document.getElementById('storageSize').textContent = totalSize > 1024 * 1024 ? `${(totalSize / 1024 / 1024).toFixed(1)} MB` : `${(totalSize / 1024).toFixed(0)} KB`;
+        }
+        async function viewPhoto(id) {
+            currentPhotoId = id;
+            const photo = await getPhoto(id);
+            if (!photo) return;
+            document.getElementById('viewerImage').src = photo.data;
+            document.getElementById('viewerUploadStatus').textContent = photo.uploaded ? '☁️ 已上傳' : '📱 本機';
+            document.getElementById('photoViewer').classList.add('active');
+            const aiResult = document.getElementById('viewerAiResult');
+            if (photo.aiDescription) { document.getElementById('viewerAiText').textContent = photo.aiDescription; aiResult.classList.add('active'); }
+            else { aiResult.classList.remove('active'); }
+        }
+        function closeViewer() {
+            document.getElementById('photoViewer').classList.remove('active');
+            document.getElementById('viewerAiResult').classList.remove('active');
+            currentPhotoId = null;
+        }
+        async function downloadCurrentPhoto() {
+            if (!currentPhotoId) return;
+            const photo = await getPhoto(currentPhotoId);
+            if (!photo) return;
+            const link = document.createElement('a');
+            link.download = `polaroid_${currentPhotoId}.jpg`;
+            link.href = photo.data;
+            link.click();
+            showToast('⬇️', '照片已下載');
+        }
+        async function deleteCurrentPhoto() {
+            if (!currentPhotoId) return;
+            if (!confirm('確定要刪除？')) return;
+            await deletePhotoFromDB(currentPhotoId);
+            closeViewer();
+            await updateGallery();
+            showToast('🗑️', '照片已刪除');
+        }
+        async function clearAllPhotos() {
+            if (!confirm('確定要刪除所有照片？')) return;
+            await clearAllPhotosFromDB();
+            document.getElementById('scatteredPhotos').innerHTML = '';
+            await updateGallery();
+            showToast('🗑️', '已清除所有照片');
+        }
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+            if (tab !== 'camera') showPage(tab);
+        }
+        function showPage(pageId) { document.getElementById(pageId + 'Page').classList.add('active'); }
+        function closePage(pageId) { document.getElementById(pageId + 'Page').classList.remove('active'); document.querySelectorAll('.tab-item').forEach(t => t.classList.toggle('active', t.dataset.tab === 'camera')); }
+        function toggleSetting(setting) {
+            switch (setting) {
+                case 'sound': soundEnabled = !soundEnabled; document.getElementById('soundSwitch').classList.toggle('active', soundEnabled); break;
+                case 'autoUpload': autoUploadEnabled = !autoUploadEnabled; document.getElementById('autoUploadSwitch').classList.toggle('active', autoUploadEnabled); break;
+                case 'lineNotify': lineNotifyEnabled = !lineNotifyEnabled; document.getElementById('lineNotifySwitch').classList.toggle('active', lineNotifyEnabled); break;
+            }
+            saveSettings();
+        }
+        function showAPIKeyInput() {
+            const key = prompt('請輸入 Gemini API Key：', geminiApiKey);
+            if (key !== null) { geminiApiKey = key.trim(); document.getElementById('apiStatus').textContent = geminiApiKey ? '✓ 已設定' : '未連接'; document.getElementById('apiStatus').style.color = geminiApiKey ? 'var(--ios-green)' : ''; saveSettings(); }
+        }
+        function saveSettings() { localStorage.setItem('polaroid_settings', JSON.stringify({ currentTheme, soundEnabled, geminiApiKey, autoUploadEnabled, lineNotifyEnabled, currentFrame, currentFilter, currentCamera })); }
+        function loadSettings() {
+            try {
+                const settings = JSON.parse(localStorage.getItem('polaroid_settings'));
+                if (settings) {
+                    currentTheme = settings.currentTheme || 'sky'; 
+                    soundEnabled = settings.soundEnabled !== false; 
+                    geminiApiKey = settings.geminiApiKey || ''; 
+                    autoUploadEnabled = settings.autoUploadEnabled || false; 
+                    lineNotifyEnabled = settings.lineNotifyEnabled !== false; 
+                    currentFrame = settings.currentFrame || 'white'; 
+                    currentFilter = settings.currentFilter || 'none';
+                    currentCamera = settings.currentCamera || 'user';
+                    
+                    console.log('載入設定，鏡頭:', currentCamera);
+                    
+                    document.body.className = `theme-${currentTheme}`;
+                    document.getElementById('soundSwitch').classList.toggle('active', soundEnabled);
+                    document.getElementById('autoUploadSwitch').classList.toggle('active', autoUploadEnabled);
+                    document.getElementById('lineNotifySwitch').classList.toggle('active', lineNotifyEnabled);
+                    if (geminiApiKey) { document.getElementById('apiStatus').textContent = '✓ 已設定'; document.getElementById('apiStatus').style.color = 'var(--ios-green)'; }
+                    document.querySelectorAll('.frame-option').forEach(opt => opt.classList.toggle('selected', opt.dataset.frame === currentFrame));
+                }
+            } catch (e) { console.error('載入設定失敗:', e); }
+        }
+        function loadCloudSettings() {
+            try {
+                // 載入獨立欄位設定
+                loadFieldSettings();
+                
+                // 載入舊版 Google 設定（向下相容）
+                const google = JSON.parse(localStorage.getItem('polaroid_google'));
+                if (google && google.googleClientId) { 
+                    document.getElementById('googleClientId').value = google.googleClientId; 
+                }
+                
+                // 載入舊版 LINE 設定（向下相容）
+                const line = JSON.parse(localStorage.getItem('polaroid_line'));
+                if (line) {
+                    if (line.lineGasUrl) document.getElementById('lineGasUrl').value = line.lineGasUrl;
+                    if (line.lineGasSecret) document.getElementById('lineGasSecret').value = line.lineGasSecret;
+                    if (line.lineToken) document.getElementById('lineToken').value = line.lineToken;
+                    if (line.lineUserId) document.getElementById('lineUserId').value = line.lineUserId;
+                }
+                
+                if (isTokenValid()) updateAuthStatus('success', '✅ 已授權（24小時有效）');
+            } catch (e) { console.error('載入設定失敗:', e); }
+        }
+        function updateIsland(icon, text) {
+            document.getElementById('dynamicIsland').querySelector('.island-icon').textContent = icon;
+            document.getElementById('islandText').textContent = text;
+        }
+        function showToast(icon, text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastIcon').textContent = icon;
+            document.getElementById('toastText').textContent = text;
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 2500);
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', async () => {
+            const progressBar = document.getElementById('bootProgressBar');
+            const statusText = document.getElementById('bootStatus');
+            try {
+                progressBar.style.width = '15%'; statusText.textContent = '初始化資料庫...';
+                await initDB(); await new Promise(r => setTimeout(r, 300));
+                
+                progressBar.style.width = '35%'; statusText.textContent = '載入設定...';
+                loadSettings(); loadCloudSettings(); await new Promise(r => setTimeout(r, 200));
+                
+                progressBar.style.width = '50%'; statusText.textContent = '載入相機...';
+                console.log('初始化相機，使用鏡頭:', currentCamera);
+                await initCamera(currentCamera); await new Promise(r => setTimeout(r, 400));
+                
+                progressBar.style.width = '65%'; statusText.textContent = '準備介面...';
+                initThemeSelector(); await new Promise(r => setTimeout(r, 300));
+                
+                progressBar.style.width = '85%'; statusText.textContent = '載入照片...';
+                await updateGallery(); await new Promise(r => setTimeout(r, 300));
+                
+                progressBar.style.width = '100%'; statusText.textContent = '準備完成！';
+                await new Promise(r => setTimeout(r, 600));
+                document.getElementById('bootScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.add('loaded');
+                setTimeout(() => document.getElementById('bootScreen').remove(), 1000);
+            } catch (error) {
+                console.error('初始化失敗:', error);
+                statusText.textContent = '初始化失敗，請重新整理';
+                statusText.style.color = '#FF453A';
+            }
+        });
+    </script>
+</body>
+</html>
