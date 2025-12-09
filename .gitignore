@@ -1,0 +1,15 @@
+# 系統檔案
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# 暫存
+*.log
+*.tmp
+
+# 本機設定（不要上傳 API Key）
+.env
+config.local.js
